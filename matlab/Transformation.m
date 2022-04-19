@@ -29,9 +29,9 @@ T_hand=GetTransformationMatrix(Group2_Rxyz(5,:), Group2_Txyz(5,:));
 origin=[0 0 0]';
 hand=T_hand(1:3,1:3)*origin+T_hand(1:3,4);
 plot3(origin(1),origin(2),origin(3),'o','Color','black');
-hold on;
-plot3(hand(1),hand(2),hand(3),'o','Color','blue');
-grid on; hold on;
+hold on; grid on;
+% plot3(hand(1),hand(2),hand(3),'o','Color','blue');
+% grid on; hold on;
 %------------------------------------------
 
 %----------------target(fake)--------------------
@@ -47,9 +47,8 @@ P_target=[200 100 300]';
 T_target=[R_target P_target;0 0 0 1];
 % target
 target=T_target(1:3,1:3)*origin+T_target(1:3,4);
-plot3(target(1),target(2),target(3),'o','Color','red')
-
-hold on;
+% plot3(target(1),target(2),target(3),'o','Color','red')
+% hold on;
 %-------------------------------------------
 
 
@@ -71,22 +70,24 @@ for i=6:3619
     T_target_hand=T_target_o*T_hand;
     
     %new target action
+
     target=T_target_hand(1:3,1:3)*hand+T_target_hand(1:3,4);
     
     %plot
     plot3(target(1),target(2),target(3),'o','Color','red');
-    hold on;
     plot3(hand(1),hand(2),hand(3),'o','Color','blue');
-    hold on;
-    drawnow
+    drawnow;
+  
+%      plot3(target(1),target(2),target(3),'o','Color','y');
+%      plot3(hand(1),hand(2),hand(3),'o','Color','y');
 
+    
     %update T_target
     % T_target:
     %
     % _____ 0            ______  0       ______ hand
     %   |           ==      |               |   
     %   |   target          |    hand       |   target
-    %
     T_hand_target=[T_target_hand(1:3,1:3)' -T_target_hand(1:3,1:3)*T_target_hand(1:3,4); 0 0 0 1];
     T_target=T_hand*T_hand_target;
     
