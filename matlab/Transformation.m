@@ -8,13 +8,30 @@ Group2_Rxyz=M(:,9:11);
 Group2_Txyz=M(:,12:14);
 Group3_Rxyz=M(:,15:17);
 Group3_Txyz=M(:,18:20);
-%%
-% red circle: target
-% black circle: origin
-% blue circle: hand
+handang=[];tarang=[];
+% %--------ROS---------
+% rosshutdown
+% setenv('ROS_IP','...') %put ROS IP
+% rosinit
+% % define publisher
+% TransMatrix1_pub = rospublisher('/TransMatrix', 'std_msgs/Float64MultiArray');
+% TransMatrix2_pub = rospublisher('/TransMatrix', 'std_msgs/Float64MultiArray');
+% TransMatrix3_pub = rospublisher('/TransMatrix', 'std_msgs/Float64MultiArray');
+% HandAng_pub = rospublisher('/HandAng', 'std_msgs/Float64');
+% TransMatrix1_msg = rosmessage(TransMatrix1_pub);
+% TransMatrix2_msg = rosmessage(TransMatrix2_pub);
+% TransMatrix3_msg = rosmessage(TransMatrix3_pub);
+% HandAng_msg = rosmessage(HandAng_pub);
+% Transmatrix1_msg.Data = NaN(4);
+% Transmatrix2_msg.Data = NaN(4);
+% Transmatrix3_msg.Data = NaN(4);
+% HandAng_msg.Data = nan;
+% %-----------------------
 
 
-%----------------control------------------
+
+
+%----------------hand------------------
 % hand control transformation matrix 
 
 % T_hand:
@@ -24,17 +41,21 @@ Group3_Txyz=M(:,18:20);
 %   |   hand      
 %
 
-T_hand=GetTransformationMatrix(Group2_Rxyz(5,:), Group2_Txyz(5,:)); 
+T1_hand=GetTransformationMatrix(Group1_Rxyz(5,:), Group1_Txyz(5,:)); 
+T2_hand=GetTransformationMatrix(Group2_Rxyz(5,:), Group2_Txyz(5,:)); 
+T3_hand=GetTransformationMatrix(Group3_Rxyz(5,:), Group3_Txyz(5,:));
 
-origin=[0 0 0]';
-hand=T_hand(1:3,1:3)*origin+T_hand(1:3,4);
-plot3(origin(1),origin(2),origin(3),'o','Color','black');
+g1=Group1_Txyz(5,:);
+g2=Group2_Txyz(5,:);
+g3=Group3_Txyz(5,:);
+hand=vertcat(g1,g2,g3);
+plot3(hand(:,1),hand(:,2),hand(:,3),'color','blue')
 hold on; grid on;
-% plot3(hand(1),hand(2),hand(3),'o','Color','blue');
-% grid on; hold on;
-%------------------------------------------
 
-%----------------target(fake)--------------------
+
+%----------------target--------------------------------------------------
+%-------to do: read transformation matrix from the simulation and replace the T_target below
+%------------------------------------------------------------------------
 % T_target:
 %
 % _____ 0
@@ -42,54 +63,98 @@ hold on; grid on;
 %   |   target      
 %
 % target tranformation matrix
-R_target=eye(3);
-P_target=[200 100 300]';
-T_target=[R_target P_target;0 0 0 1];
-% target
-target=T_target(1:3,1:3)*origin+T_target(1:3,4);
-% plot3(target(1),target(2),target(3),'o','Color','red')
-% hold on;
+R1_target=eye(3);
+P1_target=[100 100 100]';
+T1_target=[R1_target P1_target;0 0 0 1];
+R2_target=eye(3);
+P2_target=[100 101 101]';
+T2_target=[R2_target P2_target;0 0 0 1];
+R3_target=eye(3);
+P3_target=[100 105 100]';
+T3_target=[R3_target P3_target;0 0 0 1];
 %-------------------------------------------
 
 
 %% start moving
-for i=6:3619
+% red circle: target
+% blue circle: hand
+for i=6:2000
     %new hand transformation matrix
-    T_hand=GetTransformationMatrix(Group2_Rxyz(i,:), Group2_Txyz(i,:));
+    T1_hand=GetTransformationMatrix(Group1_Rxyz(i,:), Group1_Txyz(i,:));
+    T2_hand=GetTransformationMatrix(Group2_Rxyz(i,:), Group2_Txyz(i,:));
+    T3_hand=GetTransformationMatrix(Group3_Rxyz(i,:), Group3_Txyz(i,:));
     %new hand action
-    hand=T_hand(1:3,1:3)*origin+T_hand(1:3,4);
-   
-    %get T_targe_hand
+    g1=Group1_Txyz(i,:);
+    g2=Group2_Txyz(i,:);
+    g3=Group3_Txyz(i,:);
+    hand=vertcat(g1,g2,g3);
+    plot3(hand(:,1),hand(:,2),hand(:,3),'o-','color','blue')
+    hold on; grid on;
+    xlim([-1000,1000])
+    ylim([-1000,1000])
+    zlim([-1000,1000])
+    
+    %get T_target_hand
     % T_target_hand:
     %
-    % _____ targt        ______ targrt   ______ o
+    % _____ target        ______ target   ______ o
     %   |           ==      |               |   
     %   |   hand            |    0          |   hand
     %
-    T_target_o=[R_target' -R_target*P_target; 0 0 0 1];
-    T_target_hand=T_target_o*T_hand;
+    T1_target_o=[R1_target' -R1_target*P1_target; 0 0 0 1];
+    T1_target_hand=T1_target_o*T1_hand;
     
-    %new target action
+    T2_target_o=[R2_target' -R2_target*P2_target; 0 0 0 1];
+    T2_target_hand=T2_target_o*T2_hand;
+    
+    T3_target_o=[R3_target' -R3_target*P3_target; 0 0 0 1];
+    T3_target_hand=T3_target_o*T3_hand;
 
-    target=T_target_hand(1:3,1:3)*hand+T_target_hand(1:3,4);
-    
-    %plot
-    plot3(target(1),target(2),target(3),'o','Color','red');
-    plot3(hand(1),hand(2),hand(3),'o','Color','blue');
-    drawnow;
-  
-%      plot3(target(1),target(2),target(3),'o','Color','y');
-%      plot3(hand(1),hand(2),hand(3),'o','Color','y');
-
-    
     %update T_target
     % T_target:
     %
     % _____ 0            ______  0       ______ hand
     %   |           ==      |               |   
     %   |   target          |    hand       |   target
-    T_hand_target=[T_target_hand(1:3,1:3)' -T_target_hand(1:3,1:3)*T_target_hand(1:3,4); 0 0 0 1];
-    T_target=T_hand*T_hand_target;
+    T1_hand_target=[T1_target_hand(1:3,1:3)' -T1_target_hand(1:3,1:3)*T1_target_hand(1:3,4); 0 0 0 1];
+    T1_target=T1_hand*T1_hand_target;
+    
+    T2_hand_target=[T2_target_hand(1:3,1:3)' -T2_target_hand(1:3,1:3)*T2_target_hand(1:3,4); 0 0 0 1];
+    T2_target=T2_hand*T2_hand_target;
+    
+    T3_hand_target=[T3_target_hand(1:3,1:3)' -T3_target_hand(1:3,1:3)*T3_target_hand(1:3,4); 0 0 0 1];
+    T3_target=T3_hand*T3_hand_target;
+    
+    %new target action
+    target=vertcat(T1_target(1:3,4)',T2_target(1:3,4)',T3_target(1:3,4)');
+    plot3(target(:,1),target(:,2),target(:,3),'o-','color','r')
+    pause(0.01);
+    hold off;
+
+    %calculate angles
+    G12=g1-g2;
+    G32=g3-g2;
+    angle = atan2d(norm(cross(G12,G32)), dot(G12,G32));
+    handang=[handang;angle];
+    fprintf("hand_angle: %f\n",angle)
+
+    T12=target(1,:)-target(2,:);
+    T32=target(3,:)-target(2,:);
+    a = atan2d(norm(cross(T12,T32)), dot(T12,T32));
+    tarang=[tarang;a];
+    fprintf("target_angle: %f\n\n",angle)
     
 end
 
+
+%% publish message
+%     TransMatrix1_msg.Data = T1_target_hand;
+%     TransMatrix2_msg.Data = T2_target_hand;
+%     TransMatrix3_msg.Data = T3_target_hand;
+%     HandAng_msg.Data = angle;
+% 
+%     send(TransMatrix1_pub, TransMatrix1_msg);
+%     send(TransMatrix2_pub, TransMatrix2_msg);
+%     send(TransMatrix3_pub, TransMatrix3_msg);
+%     send(HandAng_pub, HandAng_msg);
+%     waitfor(rate);
