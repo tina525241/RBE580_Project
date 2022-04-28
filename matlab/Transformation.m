@@ -10,22 +10,15 @@ Group3_Rxyz=M(:,15:17);
 Group3_Txyz=M(:,18:20);
 handang=[];tarang=[];
 % %--------ROS---------
-% rosshutdown
-% setenv('ROS_IP','...') %put ROS IP
-% rosinit
+rosshutdown
+setenv('ROS_MASTER_URI','http://192.168.1.19:11311') %%%%%%%%%% change this 
+rosinit
 % % define publisher
-% TransMatrix1_pub = rospublisher('/TransMatrix', 'std_msgs/Float64MultiArray');
-% TransMatrix2_pub = rospublisher('/TransMatrix', 'std_msgs/Float64MultiArray');
-% TransMatrix3_pub = rospublisher('/TransMatrix', 'std_msgs/Float64MultiArray');
-% HandAng_pub = rospublisher('/HandAng', 'std_msgs/Float64');
-% TransMatrix1_msg = rosmessage(TransMatrix1_pub);
-% TransMatrix2_msg = rosmessage(TransMatrix2_pub);
-% TransMatrix3_msg = rosmessage(TransMatrix3_pub);
-% HandAng_msg = rosmessage(HandAng_pub);
-% Transmatrix1_msg.Data = NaN(4);
-% Transmatrix2_msg.Data = NaN(4);
-% Transmatrix3_msg.Data = NaN(4);
-% HandAng_msg.Data = nan;
+TransMatrix_pub = rospublisher('TransMatrix', 'std_msgs/Float64MultiArray');
+HandAng_pub = rospublisher('HandAng', 'std_msgs/Float64');
+TransMatrix_msg = rosmessage(TransMatrix_pub);
+HandAng_msg = rosmessage(HandAng_pub);
+
 % %-----------------------
 
 
@@ -54,7 +47,8 @@ hold on; grid on;
 
 
 %----------------target--------------------------------------------------
-%-------to do: read transformation matrix from the simulation and replace the T_target below
+%--read transformation matrix from the simulation and replace the T_target
+%below??
 %------------------------------------------------------------------------
 % T_target:
 %
@@ -109,6 +103,7 @@ for i=6:2000
     
     T3_target_o=[R3_target' -R3_target*P3_target; 0 0 0 1];
     T3_target_hand=T3_target_o*T3_hand;
+   
 
     %update T_target
     % T_target:
@@ -144,17 +139,12 @@ for i=6:2000
     tarang=[tarang;a];
     fprintf("target_angle: %f\n\n",angle)
     
+    %publish 
+    HandAng_msg.Data = angle;
+    send(HandAng_pub, HandAng_msg);
+    TransMatrix_msg.Data = T2_hand;
+    send(TransMatrix_pub, TransMatrix_msg);
 end
 
 
-%% publish message
-%     TransMatrix1_msg.Data = T1_target_hand;
-%     TransMatrix2_msg.Data = T2_target_hand;
-%     TransMatrix3_msg.Data = T3_target_hand;
-%     HandAng_msg.Data = angle;
-% 
-%     send(TransMatrix1_pub, TransMatrix1_msg);
-%     send(TransMatrix2_pub, TransMatrix2_msg);
-%     send(TransMatrix3_pub, TransMatrix3_msg);
-%     send(HandAng_pub, HandAng_msg);
-%     waitfor(rate);
+
