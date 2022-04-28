@@ -16,5 +16,5 @@
 1. `echo $ROS_MASTER_URI` in ubuntu terminal
 2. Change it in matlab script(line 14)
 
-## Subscriber examle
+## Subscriber example
 1. `test_sub.py` is an example subscriber to subscrib the transformation matrix.
