@@ -5,6 +5,9 @@
 ### Matlab
 1. Install python2.7 and add to PATH ([tutorial](https://datascience.com.co/how-to-install-python-2-7-and-3-6-in-windows-10-add-python-path-281e7eae62a))
 2. Type `pyenv('Version','2.7')` in Matlab
+#### 
+ Topic `TransMatrix`: The transformtaion matrix of the wrist point (T2_hand)
+ Topic `HandAng`: The angle(degree) between fingers
 
 ### Connect to ROS
 #### Virtual Machine
