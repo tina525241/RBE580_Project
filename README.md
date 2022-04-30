@@ -5,9 +5,6 @@
 ### Matlab
 1. Install python2.7 and add to PATH ([tutorial](https://datascience.com.co/how-to-install-python-2-7-and-3-6-in-windows-10-add-python-path-281e7eae62a))
 2. Type `pyenv('Version','2.7')` in Matlab
-#### 
-1. Topic `TransMatrix`: The transformtaion matrix of the wrist point (T2_hand)
-2. Topic `HandAng`: The angle(degree) between fingers
 
 ### Connect to ROS
 #### Virtual Machine
@@ -20,4 +17,7 @@
 2. Change it in matlab script(line 14)
 
 ## Subscriber example
-1. `test_sub.py` is an example subscriber to subscrib the transformation matrix.
+-  `test_sub.py` is an example subscriber to subscrib the transformation matrix. 
+-  Topic `TransMatrix`: The transformtaion matrix of the wrist point (T2_hand)
+-  Topic `HandAng`: The angle(degree) between fingers
+
