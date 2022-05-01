@@ -16,16 +16,15 @@ Group3_Txyz=M(:,18:20);
 handang=[];tarang=[];
 
 % %--------ROS---------
-rosshutdown
-setenv('ROS_MASTER_URI','http://192.168.1.19:11311') %%%%%%%%%% change this 
-rosinit
-
-% % Define publisher
-TransMatrix_pub = rospublisher('TransMatrix', 'std_msgs/Float64MultiArray');
-HandAng_pub = rospublisher('HandAng', 'std_msgs/Float64');
-TransMatrix_msg = rosmessage(TransMatrix_pub);
-HandAng_msg = rosmessage(HandAng_pub);
-
+% rosshutdown
+% setenv('ROS_MASTER_URI','http://192.168.1.19:11311') %%%%%%%%%% change this 
+% rosinit
+% 
+% % % Define publisher
+% TransMatrix_pub = rospublisher('TransMatrix', 'std_msgs/Float64MultiArray');
+% HandAng_pub = rospublisher('HandAng', 'std_msgs/Float64');
+% TransMatrix_msg = rosmessage(TransMatrix_pub);
+% HandAng_msg = rosmessage(HandAng_pub);
 % %-----------------------
 
 %----------------hand------------------
@@ -92,6 +91,7 @@ for i=6:2000
     ylim([-1000,1000])
     zlim([-1000,1000])
     
+
     % Get T_target_hand
     % T_target_hand:
     %
@@ -141,13 +141,14 @@ for i=6:2000
     T32=target(3,:)-target(2,:);
     a = atan2d(norm(cross(T12,T32)), dot(T12,T32));
     tarang=[tarang;a];
-    fprintf("target_angle: %f\n\n",angle)
+    fprintf("target_angle: %f\n\n",a)
     
+
     % Publish 
-    HandAng_msg.Data = angle;
-    send(HandAng_pub, HandAng_msg);
-    TransMatrix_msg.Data = T2_hand;
-    send(TransMatrix_pub, TransMatrix_msg);
+%     HandAng_msg.Data = angle;
+%     send(HandAng_pub, HandAng_msg);
+%     TransMatrix_msg.Data = T2_hand;
+%     send(TransMatrix_pub, TransMatrix_msg);
 end
 
 
