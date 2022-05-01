@@ -1,19 +1,26 @@
 %% initialize
 clear; clc;
+
 % read data
 M = readmatrix('davinci wrist sample.csv');
+
+% Extracting rotations and translations from the vicon data collected in lab
 Group1_Rxyz=M(:,3:5);
 Group1_Txyz=M(:,6:8);
 Group2_Rxyz=M(:,9:11);
 Group2_Txyz=M(:,12:14);
 Group3_Rxyz=M(:,15:17);
 Group3_Txyz=M(:,18:20);
+
+% Creating empty matrixces for preallocation
 handang=[];tarang=[];
+
 % %--------ROS---------
 rosshutdown
 setenv('ROS_MASTER_URI','http://192.168.1.19:11311') %%%%%%%%%% change this 
 rosinit
-% % define publisher
+
+% % Define publisher
 TransMatrix_pub = rospublisher('TransMatrix', 'std_msgs/Float64MultiArray');
 HandAng_pub = rospublisher('HandAng', 'std_msgs/Float64');
 TransMatrix_msg = rosmessage(TransMatrix_pub);
@@ -21,12 +28,9 @@ HandAng_msg = rosmessage(HandAng_pub);
 
 % %-----------------------
 
-
-
-
 %----------------hand------------------
-% hand control transformation matrix 
-
+% Hand control transformation matrix 
+%
 % T_hand:
 %
 % _____ 0
@@ -73,11 +77,11 @@ T3_target=[R3_target P3_target;0 0 0 1];
 % red circle: target
 % blue circle: hand
 for i=6:2000
-    %new hand transformation matrix
+    % New hand transformation matrix
     T1_hand=GetTransformationMatrix(Group1_Rxyz(i,:), Group1_Txyz(i,:));
     T2_hand=GetTransformationMatrix(Group2_Rxyz(i,:), Group2_Txyz(i,:));
     T3_hand=GetTransformationMatrix(Group3_Rxyz(i,:), Group3_Txyz(i,:));
-    %new hand action
+    % New hand action
     g1=Group1_Txyz(i,:);
     g2=Group2_Txyz(i,:);
     g3=Group3_Txyz(i,:);
@@ -88,7 +92,7 @@ for i=6:2000
     ylim([-1000,1000])
     zlim([-1000,1000])
     
-    %get T_target_hand
+    % Get T_target_hand
     % T_target_hand:
     %
     % _____ target        ______ target   ______ o
@@ -105,7 +109,7 @@ for i=6:2000
     T3_target_hand=T3_target_o*T3_hand;
    
 
-    %update T_target
+    % Update T_target
     % T_target:
     %
     % _____ 0            ______  0       ______ hand
@@ -120,13 +124,13 @@ for i=6:2000
     T3_hand_target=[T3_target_hand(1:3,1:3)' -T3_target_hand(1:3,1:3)*T3_target_hand(1:3,4); 0 0 0 1];
     T3_target=T3_hand*T3_hand_target;
     
-    %new target action
+    % New target action
     target=vertcat(T1_target(1:3,4)',T2_target(1:3,4)',T3_target(1:3,4)');
     plot3(target(:,1),target(:,2),target(:,3),'o-','color','r')
     pause(0.01);
     hold off;
 
-    %calculate angles
+    % Calculate angles
     G12=g1-g2;
     G32=g3-g2;
     angle = atan2d(norm(cross(G12,G32)), dot(G12,G32));
@@ -139,7 +143,7 @@ for i=6:2000
     tarang=[tarang;a];
     fprintf("target_angle: %f\n\n",angle)
     
-    %publish 
+    % Publish 
     HandAng_msg.Data = angle;
     send(HandAng_pub, HandAng_msg);
     TransMatrix_msg.Data = T2_hand;
