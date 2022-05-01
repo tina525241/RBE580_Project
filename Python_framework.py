@@ -3,7 +3,9 @@
 # Import the Client from ambf_comm package
 # You might have to do: pip install gym
 from ambf_client import Client
+import pandas as pd
 import time
+from mat4py import loadmat
 
 # Create a instance of the client
 _client = Client()
@@ -32,17 +34,17 @@ time.sleep(.1)
 tar.set_pos(0.5,.2,0)
 time.sleep(3)
 
-
-# Load the Transformation Matrix
+# Load the Transformation Matrix positions
 # If we have the entire T then 
 # p = [T(1,4), T(2,4), T(3,4)];
 
 # Next we import the data points as a list from the CSV file
+# pip install pandas and then import
 
-# pip install pandas
-# import pandas
-# col_list = ["Point1_X","Point1_Y","Point1_Z","Point2_X","Point2_Y","Point2_Z","Point3_X","Point3_Y", "Point3	_Z"]
-# df = pd.read_csv("sample_file.csv", usecols=col_list)
+# Setting limit for rows that will show as part of the data file
+# and reading the data sets
+col_list = ["Point1_X","Point1_Y","Point1_Z","Point2_X","Point2_Y","Point2_Z","Point3_X","Point3_Y", "Point3_Z"]
+df = pd.read_csv('davinci wrist sample.csv', usecols=col_list)
 
 # Store the XYZ values of each point in 1 List , size is nx3 matrix
 #Create 3 lists for 3 points 
