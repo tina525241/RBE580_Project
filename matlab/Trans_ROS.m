@@ -6,7 +6,7 @@ Group1_Rxyz=M(:,3:5);
 Group1_Txyz=M(:,6:8);
 Group2_Rxyz=M(:,9:11);
 Group2_Txyz=M(:,12:14);
-Group3_Rxyz=M(:,15:17);
+Group3_Rxyz=M(:,15:17); 
 Group3_Txyz=M(:,18:20);
 handang=[];
 % %--------ROS---------
@@ -15,9 +15,13 @@ setenv('ROS_MASTER_URI','http://192.168.1.19:11311') %%%%%%%%%% change this
 rosinit
 % % define publisher
 TransMatrix_pub = rospublisher('TransMatrix', 'std_msgs/Float64MultiArray');
-HandAng_pub = rospublisher('HandAng', 'std_msgs/Float64');
+TransMatrix_grip1_pub = rospublisher('TransMatrix_grip1', 'std_msgs/Float64MultiArray');
+TransMatrix_grip2_pub = rospublisher('TransMatrix_grip2', 'std_msgs/Float64MultiArray');
+%HandAng_pub = rospublisher('HandAng', 'std_msgs/Float64');
 TransMatrix_msg = rosmessage(TransMatrix_pub);
-HandAng_msg = rosmessage(HandAng_pub);
+TransMatrix_grip1_msg = rosmessage(TransMatrix_grip1_pub);
+TransMatrix_grip2_msg = rosmessage(TransMatrix_grip2_pub);
+% HandAng_msg = rosmessage(HandAng_pub);
 % %-----------------------
 
 
@@ -29,7 +33,7 @@ HandAng_msg = rosmessage(HandAng_pub);
 %   |
 %   |   hand      
 %
-for i=5:1000
+for i=5:3000
   
     %hand transformation matrix
     T1_hand=GetTransformationMatrix(Group1_Rxyz(i,:), Group1_Txyz(i,:));
@@ -45,7 +49,7 @@ for i=5:1000
     xlim([-500,500])
     ylim([-500,500])
     zlim([500,1000])
-    pause(5); %%%%%%%%%%%%%%%%delay timer
+    pause(0.01); %%%%%%%%%%%%%%%%delay timer
     hold off
    
    
@@ -57,10 +61,15 @@ for i=5:1000
     fprintf("hand_angle: %f\n",angle)
    
     %publish 
-    HandAng_msg.Data = angle;
-    send(HandAng_pub, HandAng_msg);
+%     HandAng_msg.Data = angle;
+%     send(HandAng_pub, HandAng_msg);
     TransMatrix_msg.Data = T2_hand;
     send(TransMatrix_pub, TransMatrix_msg);
+    TransMatrix_grip1_msg.Data = T1_hand;
+    send(TransMatrix_grip1_pub, TransMatrix_grip1_msg);
+    TransMatrix_grip2_msg.Data = T3_hand;
+    send(TransMatrix_grip2_pub, TransMatrix_grip2_msg);
+    
 end
 
 
