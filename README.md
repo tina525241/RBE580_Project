@@ -21,3 +21,9 @@
 -  Topic `TransMatrix`: The transformtaion matrix of the wrist point (T2_hand)
 -  Topic `HandAng`: The angle(degree) between fingers
 
+##File
+- `psm_test.py`: code for running the simulation
+- `Python_framework.py`: an example of controlling the PSM
+- `GetTransformationMatrix.m`: the function of calculating trans matrix from the VICON data
+- `Trans_ROS.m`: script for publishing data to ROS topic
+- `Transformation.m`: script for understanding the relation between hand frame, tracker frame, and target frame 
